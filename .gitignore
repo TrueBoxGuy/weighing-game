@@ -1,0 +1,8 @@
+/target
+/dist
+/.gemini
+**/*.rs.bk
+Cargo.lock
+.DS_Store
+node_modules
+.vscode
