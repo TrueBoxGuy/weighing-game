@@ -1,20 +1,7 @@
 use std::rc::Rc;
 use dioxus::prelude::*;
 use crate::logic::*;
-use crate::ui::styles::*;
-use crate::ui::visuals::TreeView;
-
-#[component]
-pub fn Header() -> Element {
-    rsx! {
-        header { class: "{HEADER_CONTAINER}",
-            h1 { class: "{HEADER_H1}", 
-                "12 COINS PUZZLE" 
-            }
-            p { class: "text-gray-400 text-sm uppercase tracking-widest", "Find the forgery in 3 weighings" }
-        }
-    }
-}
+use crate::ui::solver::tree::TreeView;
 
 #[component]
 pub fn VisualizationFooter(tree: Rc<Node>, path: Vec<(Weighing, Outcome)>) -> Element {

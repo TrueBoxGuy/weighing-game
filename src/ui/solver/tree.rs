@@ -85,16 +85,16 @@ fn TreeLabel(x: f32, y: f32, left: Vec<usize>, right: Vec<usize>) -> Element {
     let left_str = left.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(" ");
     let right_str = right.iter().map(|n| n.to_string()).collect::<Vec<_>>().join(" ");
     let label = format!("{{ {} }} vs {{ {} }}", left_str, right_str);
-    let label_width = (label.len() as f32) * 5.0 + 10.0; 
+    let label_width = (label.len() as f32) * 5.0 + 25.0; 
 
     rsx! {
         rect {
             x: "{x - label_width / 2.0}", y: "{y - 35.0}",
-            width: "{label_width}", height: "16", rx: "4",
+            width: "{label_width}", height: "20", rx: "4",
             fill: "#1f2937", stroke: "#4b5563", stroke_width: "1"
         }
         text {
-            x: "{x}", y: "{y - 24.0}",
+            x: "{x}", y: "{y - 21.0}",
             text_anchor: "middle",
             fill: "#f3f4f6",
             font_size: "10",

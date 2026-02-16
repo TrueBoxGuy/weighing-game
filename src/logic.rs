@@ -2,20 +2,35 @@ use std::rc::Rc;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
-pub enum Weight {
-    Normal,
-    Heavy,
-    Light,
+pub struct Weight(pub f64);
+
+impl Weight {
+    pub const NORMAL: Self = Self(1.0);
+    // These are just defaults, actual values will be dynamic
+    pub const HEAVY: Self = Self(1.1); 
+    pub const LIGHT: Self = Self(0.9);
+
+    pub fn is_heavy(&self) -> bool {
+        self.0 > 1.0 + f64::EPSILON
+    }
+
+    pub fn is_light(&self) -> bool {
+        self.0 < 1.0 - f64::EPSILON
+    }
+
+    pub fn is_normal(&self) -> bool {
+        (self.0 - 1.0).abs() < f64::EPSILON
+    }
 }
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub enum Outcome {
     Balanced,
     LeftHeavy,
     RightHeavy,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Weighing {
     pub left: Vec<usize>,
     pub right: Vec<usize>,
@@ -71,33 +86,36 @@ pub fn build_tree() -> Node {
     decision(&[1, 2, 3, 4], &[5, 6, 7, 8], branch_left, branch_balanced, branch_right)
 }
 
-pub fn get_outcome(weighing: &Weighing, fake_coin: usize, nature: Weight) -> Option<Outcome> {
-    if weighing.left.len() != weighing.right.len() {
-        return None;
-    }
-    
-    if nature == Weight::Normal {
-        return Some(Outcome::Balanced); 
+
+
+// Update get_outcome to use generic weights
+pub fn get_outcome(weighing: &Weighing, weights: &[Weight]) -> Option<Outcome> {
+    let mut left_weight = 0.0;
+    let mut right_weight = 0.0;
+
+    for &coin_idx in &weighing.left {
+         // Coins are 1-indexed in UI/Weighing, but 0-indexed in weights vec
+         if coin_idx > 0 && coin_idx <= weights.len() {
+             left_weight += weights[coin_idx - 1].0;
+         }
     }
 
-    let mut left_weight = 0;
-    let mut right_weight = 0;
-
-    // We can just track the delta caused by the fake coin
-    if weighing.left.contains(&fake_coin) {
-        left_weight += if nature == Weight::Heavy { 1 } else { -1 };
-    }
-    if weighing.right.contains(&fake_coin) {
-        right_weight += if nature == Weight::Heavy { 1 } else { -1 };
+    for &coin_idx in &weighing.right {
+         if coin_idx > 0 && coin_idx <= weights.len() {
+             right_weight += weights[coin_idx - 1].0;
+         }
     }
 
-    if left_weight > right_weight {
+    if left_weight > right_weight + f64::EPSILON {
         Some(Outcome::LeftHeavy)
-    } else if right_weight > left_weight {
+    } else if right_weight > left_weight + f64::EPSILON {
         Some(Outcome::RightHeavy)
     } else {
         Some(Outcome::Balanced)
     }
 }
+
+
+
 pub mod simulation;
 pub use simulation::*;

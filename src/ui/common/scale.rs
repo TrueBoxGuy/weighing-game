@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 use crate::logic::*;
 
 #[component]
-pub fn Scale(weighing: Weighing, outcome: Outcome, fake_coin: usize, fake_weight: Weight, visible: bool) -> Element {
+pub fn Scale(weighing: Weighing, outcome: Outcome, fake_coin: usize, fake_weight: Weight, visible: bool, show_truth: bool) -> Element {
     let target_angle = match outcome {
         Outcome::Balanced => 0.0,
         Outcome::LeftHeavy => -20.0,
@@ -45,7 +45,8 @@ pub fn Scale(weighing: Weighing, outcome: Outcome, fake_coin: usize, fake_weight
                     angle: -angle, 
                     coins: weighing.left, 
                     fake_coin: fake_coin, 
-                    fake_weight: fake_weight 
+                    fake_weight: fake_weight,
+                    show_truth: show_truth
                 }
 
                 // Right Pan
@@ -54,7 +55,8 @@ pub fn Scale(weighing: Weighing, outcome: Outcome, fake_coin: usize, fake_weight
                     angle: -angle, 
                     coins: weighing.right, 
                     fake_coin: fake_coin, 
-                    fake_weight: fake_weight 
+                    fake_weight: fake_weight,
+                    show_truth: show_truth
                 }
             }
         }
@@ -62,7 +64,7 @@ pub fn Scale(weighing: Weighing, outcome: Outcome, fake_coin: usize, fake_weight
 }
 
 #[component]
-fn Pan(x: f32, angle: f32, coins: Vec<usize>, fake_coin: usize, fake_weight: Weight) -> Element {
+fn Pan(x: f32, angle: f32, coins: Vec<usize>, fake_coin: usize, fake_weight: Weight, show_truth: bool) -> Element {
     // Pan geometry logic (shared)
     let pan_y = 140.0;
     
@@ -87,7 +89,7 @@ fn Pan(x: f32, angle: f32, coins: Vec<usize>, fake_coin: usize, fake_weight: Wei
             // Coins
             g { transform: "translate({x}, {pan_y})",
                 for (i, &c) in coins.iter().enumerate() {
-                    Coin { i, c, is_fake: c == fake_coin, fake_weight }
+                    Coin { i, c, is_fake: c == fake_coin, fake_weight, show_truth }
                 }
             }
         }
@@ -95,12 +97,14 @@ fn Pan(x: f32, angle: f32, coins: Vec<usize>, fake_coin: usize, fake_weight: Wei
 }
 
 #[component]
-fn Coin(i: usize, c: usize, is_fake: bool, fake_weight: Weight) -> Element {
-    let color = if is_fake {
-        match fake_weight {
-            Weight::Heavy => "#ef4444", 
-            Weight::Light => "#3b82f6", 
-            _ => "#fbbf24", 
+fn Coin(i: usize, c: usize, is_fake: bool, fake_weight: Weight, show_truth: bool) -> Element {
+    let color = if is_fake && show_truth {
+        if fake_weight.is_heavy() {
+            "#ef4444" 
+        } else if fake_weight.is_light() {
+            "#3b82f6" 
+        } else {
+            "#fbbf24" 
         }
     } else {
         "#fbbf24"

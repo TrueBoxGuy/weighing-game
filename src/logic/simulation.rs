@@ -8,7 +8,7 @@ pub fn use_simulation(
     selected_weight: Signal<Weight>
 ) -> Memo<Vec<(Weighing, Outcome)>> {
     use_memo(move || {
-        if selected_coin() != 0 && selected_weight() == Weight::Normal {
+        if selected_coin() != 0 && selected_weight() == Weight::NORMAL {
             return Vec::new();
         }
         
@@ -20,7 +20,11 @@ pub fn use_simulation(
             let outcome = if selected_coin() == 0 {
                  Outcome::Balanced 
             } else {
-                 get_outcome(weighing, selected_coin(), selected_weight()).unwrap_or(Outcome::Balanced)
+                 let mut weights = vec![Weight::NORMAL; 12];
+                 if selected_coin() <= 12 {
+                     weights[selected_coin() - 1] = selected_weight();
+                 }
+                 get_outcome(weighing, &weights).unwrap_or(Outcome::Balanced)
             };
             
             p.push((weighing.clone(), outcome));
