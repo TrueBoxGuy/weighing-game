@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 use crate::ui::game::state::*;
 use crate::ui::styles::*;
 use crate::ui::game::config::*;
+use crate::ui::game::coin_bank::*;
 use crate::ui::game::scale::*;
 use crate::ui::game::history::*;
 use crate::ui::game::guessing::*;

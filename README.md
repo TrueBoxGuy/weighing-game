@@ -26,6 +26,7 @@ This application is an interactive puzzle game where your goal is to identify co
 
 Local:
 ```bash
+npm install
 trunk serve
 ```
 
@@ -38,6 +39,7 @@ Tailwind is integrated directly into the **Trunk** build pipeline via `Trunk.tom
 
 To build for release:
 ```bash
+npm install
 trunk build --release
 ```
 

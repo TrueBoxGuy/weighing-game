@@ -19,7 +19,33 @@ pub fn HistoryLog(history: Vec<(Weighing, Outcome)>) -> Element {
     rsx! {
         div { class: "bg-[#1a1a1a] rounded-2xl border border-neutral-800 flex flex-col relative",
             div { class: "p-6 pb-2 bg-[#1a1a1a] z-10 border-b border-neutral-800/50 flex justify-between items-center",
-                h3 { class: "text-neutral-400 font-bold text-xs uppercase tracking-widest", "HISTORY" }
+                div { class: "flex items-center gap-3",
+                    h3 { class: "text-neutral-400 font-bold text-xs uppercase tracking-widest", "HISTORY" }
+                    button {
+                        class: "text-neutral-600 hover:text-white transition-colors p-1 rounded hover:bg-neutral-800",
+                        title: "Copy to Clipboard",
+                        onclick: move |_| {
+                            let text = history.iter().enumerate().map(|(i, (w, o))| {
+                                let outcome = match o {
+                                    Outcome::Balanced => "Balanced",
+                                    Outcome::LeftHeavy => "Left Heavy",
+                                    Outcome::RightHeavy => "Right Heavy",
+                                };
+                                format!("{}. {:?} vs {:?} -> {}", i + 1, w.left, w.right, outcome)
+                            }).collect::<Vec<_>>().join("\n");
+                            
+                            spawn(async move {
+                                if let Some(window) = web_sys::window() {
+                                    let navigator = window.navigator();
+                                    let clipboard = navigator.clipboard();
+                                    let _ = clipboard.write_text(&text);
+                                }
+                            });
+                        },
+                        span { class: "material-symbols-outlined text-sm select-none", "content_copy" }
+                    }
+                }
+
                 if total_pages > 1 {
                     div { class: "flex gap-2 text-xs font-mono",
                         button { 

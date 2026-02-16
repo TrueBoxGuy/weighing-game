@@ -24,6 +24,10 @@ impl GameModeLogic {
         self.current_weighing.set(Weighing::new(&[], &[]));
         self.status.set(GameStatus::Playing);
     }
+
+    pub fn continue_game(&mut self) {
+        self.status.set(GameStatus::Playing);
+    }
 }
 
 pub fn use_game_mode() -> GameModeLogic {
@@ -32,6 +36,7 @@ pub fn use_game_mode() -> GameModeLogic {
         bad_coins: BadCoinConstraints { min: 0, max: 1 },
         deviation_min_factor: 0.8,
         deviation_max_factor: 1.3,
+        grouping: None, // Default to infinity (no grouping)
     }));
     let current_weighing = use_signal(|| Weighing::new(&[], &[]));
     let status = use_signal(|| GameStatus::Playing);

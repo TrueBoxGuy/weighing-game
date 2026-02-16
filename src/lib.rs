@@ -7,6 +7,8 @@ pub mod logic;
 pub mod ui;
 pub mod gamemodel;
 
+use crate::ui::game::help::HelpButton;
+
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum AppMode {
     Game,
@@ -37,15 +39,25 @@ pub fn app() -> Element {
 fn ModeSwitcher(mode: Signal<AppMode>) -> Element {
     rsx! {
         div { class: "{MODE_SWITCHER_CONTAINER}",
-            button { 
-                class: if mode() == AppMode::Game { MODE_BTN_ACTIVE } else { MODE_BTN_INACTIVE },
-                onclick: move |_| mode.set(AppMode::Game),
-                "Game Mode"
+            {
+                if mode() == AppMode::Game {
+                    rsx! { HelpButton {} }
+                } else {
+                    rsx! { div { class: "w-8" } }
+                }
             }
-            button { 
-                class: if mode() == AppMode::Solver { MODE_BTN_ACTIVE } else { MODE_BTN_INACTIVE },
-                onclick: move |_| mode.set(AppMode::Solver),
-                "Solver Mode"
+            
+            div { class: "flex gap-2",
+                button { 
+                    class: if mode() == AppMode::Game { MODE_BTN_ACTIVE } else { MODE_BTN_INACTIVE },
+                    onclick: move |_| mode.set(AppMode::Game),
+                    "Game Mode"
+                }
+                button { 
+                    class: if mode() == AppMode::Solver { MODE_BTN_ACTIVE } else { MODE_BTN_INACTIVE },
+                    onclick: move |_| mode.set(AppMode::Solver),
+                    "Solver Mode"
+                }
             }
         }
     }

@@ -53,7 +53,7 @@ pub const BTN_CLEAR_NORMAL: &str = "px-6 py-3 bg-neutral-700 text-neutral-300 ro
 pub const DROPTARGET: &str = "absolute w-[60px] h-[60px] cursor-pointer hover:bg-white/10 rounded-full flex items-center justify-center transition-colors border-2 border-transparent hover:border-white/20";
 
 // Mode Switcher
-pub const MODE_SWITCHER_CONTAINER: &str = "flex justify-end p-4 gap-2 z-50 relative";
+pub const MODE_SWITCHER_CONTAINER: &str = "flex justify-between items-center p-4 gap-2 z-50 relative";
 pub const MODE_BTN_ACTIVE: &str = "px-3 py-1 bg-blue-600 text-white rounded shadow";
 pub const MODE_BTN_INACTIVE: &str = "px-3 py-1 bg-gray-700 text-gray-300 rounded hover:bg-gray-600";
 

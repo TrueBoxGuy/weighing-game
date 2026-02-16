@@ -57,10 +57,20 @@ pub fn ResultScreen(logic: GameModeLogic, won: bool, attempts: usize) -> Element
                     p { class: "text-neutral-500 text-sm mb-8", "There were no bad coins." }
                 }
                 
-                button {
-                    class: "{OVERLAY_BTN}",
-                    onclick: move |_| logic.reset(),
-                    "PLAY AGAIN"
+                div { class: "flex flex-col items-center gap-4 w-full",
+                    // Simple, direct button style to avoid conflicts
+                    button {
+                        class: "w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors text-lg tracking-wide",
+                        onclick: move |_| logic.reset(),
+                        "PLAY AGAIN"
+                    }
+                    
+                    // Simple text link
+                    button {
+                        class: "text-neutral-500 hover:text-neutral-400 text-xs font-bold uppercase tracking-widest hover:underline cursor-pointer transition-colors",
+                        onclick: move |_| logic.continue_game(),
+                        "Keep this game"
+                    }
                 }
             }
         }
