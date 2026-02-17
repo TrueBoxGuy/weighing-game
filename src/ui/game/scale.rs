@@ -7,6 +7,8 @@ use crate::ui::common::Scale;
 #[component]
 pub fn InteractiveScale(logic: GameModeLogic, selection: Signal<Option<usize>>) -> Element {
     let weighing = logic.current_weighing.read().clone();
+    let mut displayed_outcome = use_signal(|| Outcome::Balanced);
+    
     
     let on_drop_left = move |_| {
         if let Some(coin) = selection() {
@@ -15,6 +17,7 @@ pub fn InteractiveScale(logic: GameModeLogic, selection: Signal<Option<usize>>) 
             if !w.left.contains(&coin) { w.left.push(coin); w.left.sort(); }
             logic.current_weighing.set(w);
             selection.set(None);
+            displayed_outcome.set(Outcome::Balanced);
         }
     };
 
@@ -25,18 +28,22 @@ pub fn InteractiveScale(logic: GameModeLogic, selection: Signal<Option<usize>>) 
             if !w.right.contains(&coin) { w.right.push(coin); w.right.sort(); }
             logic.current_weighing.set(w);
             selection.set(None);
+            displayed_outcome.set(Outcome::Balanced);
         }
     };
 
     let on_weigh = move |_| {
         let w = logic.current_weighing.read().clone();
         if !w.left.is_empty() && !w.right.is_empty() {
-             logic.state.write().weigh(w);
+             if let Some(outcome) = logic.state.write().weigh(w) {
+                 displayed_outcome.set(outcome);
+             }
         }
     };
 
     let on_clear = move |_| {
         logic.current_weighing.set(Weighing { left: vec![], right: vec![] });
+        displayed_outcome.set(Outcome::Balanced);
     };
 
     let mut remove_coin = move |coin: usize, is_left: bool| {
@@ -47,25 +54,17 @@ pub fn InteractiveScale(logic: GameModeLogic, selection: Signal<Option<usize>>) 
             if let Some(pos) = w.right.iter().position(|&c| c == coin) { w.right.remove(pos); }
         }
         logic.current_weighing.set(w);
+        displayed_outcome.set(Outcome::Balanced);
     };
     
-    let history = &logic.state.read().history;
-    let last_outcome = if let Some((last_w, outcome)) = history.last() {
-        if *last_w == weighing {
-            *outcome
-        } else {
-            Outcome::Balanced 
-        }
-    } else {
-        Outcome::Balanced
-    };
+    let current_outcome = displayed_outcome();
 
     rsx! {
         div { class: "w-full flex flex-col items-center space-y-4",
             div { class: "relative group",
                 Scale { 
                     weighing: weighing.clone(), 
-                    outcome: last_outcome, 
+                    outcome: current_outcome, 
                     fake_coin: 0, 
                     fake_weight: Weight::NORMAL, 
                     visible: true,
@@ -112,13 +111,13 @@ pub fn InteractiveScale(logic: GameModeLogic, selection: Signal<Option<usize>>) 
             
             div { class: "flex gap-4",
                  button {
-                    class: if last_outcome != Outcome::Balanced { "{BTN_CLEAR_PRIMARY}" } else { "{BTN_CLEAR_NORMAL}" },
+                    class: if current_outcome != Outcome::Balanced { "{BTN_CLEAR_PRIMARY}" } else { "{BTN_CLEAR_NORMAL}" },
                     onclick: on_clear,
                     "CLEAR"
                 }
                 button {
-                    class: if last_outcome != Outcome::Balanced { "{WEIGH_BTN_DISABLED}" } else { "{WEIGH_BTN}" },
-                    disabled: weighing.left.is_empty() || weighing.right.is_empty() || last_outcome != Outcome::Balanced,
+                    class: if current_outcome != Outcome::Balanced { "{WEIGH_BTN_DISABLED}" } else { "{WEIGH_BTN}" },
+                    disabled: weighing.left.is_empty() || weighing.right.is_empty() || current_outcome != Outcome::Balanced,
                     onclick: on_weigh,
                     "WEIGH"
                 }
