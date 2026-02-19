@@ -7,8 +7,8 @@ pub fn CoinBank(logic: GameModeLogic, selection: Signal<Option<usize>>) -> Eleme
     let total_coins = logic.state.read().config.num_coins;
     let current_weighing = logic.current_weighing.read();
     
-    // Toggle for advanced mode (left/right click)
-    let mut advanced_mode = use_signal(|| false);
+    // Use shared advanced_mode signal
+    let mut advanced_mode = logic.advanced_mode;
     
     let available: Vec<usize> = (1..=total_coins)
         .filter(|c| !current_weighing.left.contains(c) && !current_weighing.right.contains(c))

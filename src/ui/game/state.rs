@@ -14,6 +14,7 @@ pub struct GameModeLogic {
     pub state: Signal<GameState>,
     pub current_weighing: Signal<Weighing>,
     pub status: Signal<GameStatus>,
+    pub advanced_mode: Signal<bool>,
 }
 
 impl GameModeLogic {
@@ -40,10 +41,12 @@ pub fn use_game_mode() -> GameModeLogic {
     }));
     let current_weighing = use_signal(|| Weighing::new(&[], &[]));
     let status = use_signal(|| GameStatus::Playing);
+    let advanced_mode = use_signal(|| false);
 
     GameModeLogic {
         state,
         current_weighing,
         status,
+        advanced_mode,
     }
 }
